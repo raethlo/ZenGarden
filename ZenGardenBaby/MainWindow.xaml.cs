@@ -35,8 +35,10 @@ namespace ZenGardenBaby
             if (board!=null)
             {
                 int obvod = board.Circumference();
-                var father = new Monk(obvod - obvod / 4, obvod,rand);
-                var mother = new Monk(obvod - obvod / 4, obvod,rand);
+                //var father = new Monk(obvod / 2 + board.Stones.Count, obvod,rand);
+                //var mother = new Monk(obvod / 2 + board.Stones.Count, obvod,rand);
+                var father = new Monk(obvod / 4, obvod, rand);
+                var mother = new Monk(obvod / 4, obvod, rand);
                 father.EvaluateOn(board);
                 AppendLine("FATHER");
                 AppendLine("Fitness = " + father.Fitness.ToString());
@@ -51,6 +53,12 @@ namespace ZenGardenBaby
 
                 kid.EvaluateOn(board);
                 AppendLine("KID");
+                AppendLine("Fitness = " + kid.Fitness.ToString());
+                AppendLine(kid.PrintResult());
+
+                kid.Mutate();
+                kid.EvaluateOn(board);
+                AppendLine("MUTANT");
                 AppendLine("Fitness = " + kid.Fitness.ToString());
                 AppendLine(kid.PrintResult()); 
             }
