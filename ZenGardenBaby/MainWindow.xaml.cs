@@ -34,31 +34,25 @@ namespace ZenGardenBaby
         {
             if (board!=null)
             {
-                board.Reset();
                 int obvod = board.Circumference();
-                var monk = new Monk(obvod - obvod / 4, obvod,rand);
-                foreach (var g in monk.Chromosome)
-                {
-                    AppendLine("Gene: " + g.ToString());
-                }
-                monk.EvaluateOn(board);
-                AppendLine("Fitness = " + monk.Fitness.ToString());
-                AppendLine(monk.PrintResult()); 
+                var father = new Monk(obvod - obvod / 4, obvod,rand);
+                var mother = new Monk(obvod - obvod / 4, obvod,rand);
+                father.EvaluateOn(board);
+                AppendLine("FATHER");
+                AppendLine("Fitness = " + father.Fitness.ToString());
+                AppendLine(father.PrintResult()); 
 
-                AppendLine();
-                AppendLine("Mutated");
-                board.Reset();
+                mother.EvaluateOn(board);
+                AppendLine("MOTHER");
+                AppendLine("Fitness = " + mother.Fitness.ToString());
+                AppendLine(mother.PrintResult());
 
-                monk.Mutate();
+                var kid = new Monk(mother, father);
 
-                foreach (var g in monk.Chromosome)
-                {
-                    AppendLine("Gene: " + g.ToString());
-                }
-
-                monk.EvaluateOn(board);
-                AppendLine("Fitness = " + monk.Fitness.ToString());
-                AppendLine(monk.PrintResult()); 
+                kid.EvaluateOn(board);
+                AppendLine("KID");
+                AppendLine("Fitness = " + kid.Fitness.ToString());
+                AppendLine(kid.PrintResult()); 
             }
             else
             {
@@ -69,12 +63,6 @@ namespace ZenGardenBaby
 
         private void BtnLoad_Click(object sender, RoutedEventArgs e)
         {
-            var a = Encoding.ASCII.GetBytes("a")[0];
-            for (int i = 0; i < 10; i++)
-            {
-                var mark = (char)(a + i);
-                Console.WriteLine(mark);
-            }
             
             if (board == null)
             {

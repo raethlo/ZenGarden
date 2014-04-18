@@ -11,6 +11,7 @@ namespace ZenGardenBaby.Model
         public List<Gene> Chromosome { get; set; }
         public int Length { get; set; }
         public double Fitness { get; set; }
+        public int Treshold { get; set; }
         private string RakedSurfaceMap = null;
 
         public Monk(int length, int obvod, Random randomizer)
@@ -18,6 +19,7 @@ namespace ZenGardenBaby.Model
             Chromosome = new List<Gene>();
             Length = 0;
             Fitness = 0.0;
+            Treshold = obvod;
             GenerateRandom(length, obvod, randomizer);
         }
 
@@ -26,19 +28,31 @@ namespace ZenGardenBaby.Model
             if(mother.Length != father.Length)
                 throw new ArgumentException("Parents must be of the same length");
 
-            //Random rand = new Random()
+            Random rand = new Random();
             Chromosome = new List<Gene>();
             Length = father.Length;
+            Treshold = father.Treshold;
             Fitness = 0.0;
             
             Chromosome.AddRange(mother.Chromosome.Take(Length / 2));
+            //var remains = father.Chromosome.Except(Chromosome);
             var remains = father.Chromosome.Except(Chromosome);
             Chromosome.AddRange(remains.Take(Length / 2));
             if (Chromosome.Count < Length)
             {
-                for (int i = Chromosome.Count; i < Length; i++)
+                int i = Chromosome.Count;
+
+                while (i <= Length)
                 {
-                    
+                    bool tr = (rand.Next(2) == 1) ? true : false;
+                    var g = new Gene(rand.Next(father.Treshold), tr);
+                    if ((null != Chromosome.Where(t => t.Start == g.Start).FirstOrDefault()))
+                        continue;
+                    else
+                    {
+                        ++i;
+                        Chromosome.Add(g);
+                    }
                 }
             }
         }
@@ -290,9 +304,6 @@ namespace ZenGardenBaby.Model
                     this.RakedSurfaceMap = b.ToString();
                     Console.WriteLine(PrintResult());
                 }
-                    
-                else
-                    break;
             }
 
 

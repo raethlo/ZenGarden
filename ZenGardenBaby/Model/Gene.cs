@@ -30,7 +30,9 @@ namespace ZenGardenBaby.Model
 
             if (Object.ReferenceEquals(this, other)) return true;
 
-            return Start.Equals(other.Start) && TurnsRight.Equals(other.TurnsRight);
+            return Start.Equals(other.Start);// && TurnsRight.Equals(other.TurnsRight);
         }
     }
+
+
 }
