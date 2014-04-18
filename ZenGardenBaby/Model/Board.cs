@@ -13,6 +13,7 @@ namespace ZenGardenBaby.Model
         public int Y { get; set; }
         public char[,] Map { get; set; }
         public List<Obstacle> Stones { get; set; }
+        public const char Nothing = '0';
 
         public Board()
         {
@@ -29,12 +30,14 @@ namespace ZenGardenBaby.Model
                 this.X = int.Parse(c[0]);
                 this.Y = int.Parse(c[1]);
                 this.Map = new char[this.X,this.Y];
+                initBoard();
                 for (int i = 1; i < lines.Length; i++)
                 {
                     c = lines[i].Split(' ');
                     int x = int.Parse(c[0]);
                     int y = int.Parse(c[1]);
-                    Stones.Add(new Obstacle(x, y)); 
+                    Stones.Add(new Obstacle(x, y));
+                    Map[x, y] = 'X';
                 }
                 
             }
@@ -47,6 +50,51 @@ namespace ZenGardenBaby.Model
                 
                 throw;
             }
+        }
+
+        private void initBoard()
+        {
+            for (int i = 0; i < this.Y; i++)
+            {
+                for (int j = 0; j < this.X; j++)
+                {
+                    this.Map[j, i] = '0';
+                }
+            }
+        }
+
+        public void Reset()
+        {
+            initBoard();
+            foreach (var stone in Stones)
+            {
+                Map[stone.X, stone.Y] = 'X';
+            }
+        }
+
+        public int Circumference()
+        {
+            return (2 * (this.X + this.Y));
+        }
+
+        public int Surface()
+        {
+            return (X * Y);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < this.Y; i++)
+            {
+                for (int j = 0; j < this.X; j++)
+                {
+                    sb.Append(Map[j, i]+ " ");
+                }
+                sb.AppendLine();
+                
+            }
+            return sb.ToString();
         }
 
     }

@@ -7,9 +7,10 @@
             <TextBox x:Name ="t" TextWrapping="Wrap" 
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                     ScrollViewer.CanContentScroll="True"/>
+                     ScrollViewer.CanContentScroll="True" FontFamily="Courier New"/>
         </ScrollViewer>
-        <Button Name="BtnHello" Content="Say hello" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Click="BtnHello_Click"/>
+        <Button Name="BtnHello" Content="Rand monk" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Click="BtnHello_Click"/>
         <Button Name="BtnLoad" Content="Load board..." HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="BtnLoad_Click"/>
+        <Button Content="BW Test" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75"  Click="Button_Click"/>
     </StackPanel>
 </Window>

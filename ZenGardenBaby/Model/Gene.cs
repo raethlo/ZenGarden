@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ZenGardenBaby.Model
 {
-    class Gene
+    class Gene : IEquatable<Gene>
     {
         public int Start { get; set; }
         public bool TurnsRight { get; set; }
@@ -22,6 +22,15 @@ namespace ZenGardenBaby.Model
         public override String ToString()
         {
             return Start.ToString() + " turns right? = " + TurnsRight.ToString();
+        }
+
+        public bool Equals(Gene other)
+        {
+            if (Object.ReferenceEquals(other, null)) return false;
+
+            if (Object.ReferenceEquals(this, other)) return true;
+
+            return Start.Equals(other.Start) && TurnsRight.Equals(other.TurnsRight);
         }
     }
 }
