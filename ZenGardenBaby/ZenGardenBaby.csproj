@@ -69,6 +69,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\IStrategy.cs" />
     <Compile Include="Model\Monk.cs" />
     <Compile Include="Model\Obstacle.cs" />
     <Compile Include="Model\Population.cs" />

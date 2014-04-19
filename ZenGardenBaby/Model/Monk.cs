@@ -88,6 +88,15 @@ namespace ZenGardenBaby.Model
             Chromosome.Reverse(pos, 2);
         }
 
+        public void Mutate(Random randomizer)
+        {
+            //mozno rozne mutacie, 
+            //zatial vymenim nahodne dva geny vedla seba
+            int pos = randomizer.Next(Chromosome.Count - 1);
+            Console.WriteLine(pos);
+            Chromosome.Reverse(pos, 2);
+        }
+
         protected int Rake(Board b,bool turnsRight, int start_x,int start_y, char mark, Direction dir)
         {
             int x = start_x;
@@ -113,7 +122,7 @@ namespace ZenGardenBaby.Model
                             else if (b.Map[x, new_y] != Board.Nothing)
                             {
                                 
-                                if (!turnsRight && ((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing)
+                                if (!turnsRight && (((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing))
                                 {
                                     dir = Direction.Left;
                                     x--;
@@ -339,7 +348,7 @@ namespace ZenGardenBaby.Model
             return raked;
         }
 
-        public void EvaluateOn(Board b)
+        public void EvaluateOnRandomly(Board b)
         {
             double fitness = 0.0 ;
             var a = Encoding.ASCII.GetBytes("a")[0];
@@ -401,6 +410,82 @@ namespace ZenGardenBaby.Model
 
                 int raked = RakeRandomly(b, x, y, mark, dir);
                 if (raked > 0){
+                    ++i;
+                    sum += raked;
+                    //.RakedSurfaceMap = b.ToString();
+                    //Console.WriteLine(PrintResult());
+                }
+            }
+
+
+            RakedSurfaceMap = b.ToString();
+            fitness = sum;
+            this.Fitness = fitness;
+        }
+
+        public void EvaluateOn(Board b)
+        {
+            double fitness = 0.0;
+            var a = Encoding.ASCII.GetBytes("a")[0];
+            //poprechadzaj celu mapu podla instrukcii, pojde to postupne, kedze list je zoradeny
+            //Console.WriteLine("X= {0} Y={1} obvod={2}", b.X, b.Y, 2 * (b.X + b.Y));
+            byte i = 0;
+            int y = -1;
+            int x = -1;
+            int sum = 0;
+            Direction dir = Direction.Up; ;
+
+            b.Reset();
+
+            foreach (var gene in Chromosome)
+            {
+
+                char mark = (char)(i + a);
+
+                if (gene.Start < b.X)
+                {
+                    //this is case when the monk is entering from the upper side
+                    //Console.WriteLine(" {0} => upper side",gene.ToString());
+                    x = gene.Start;
+                    y = 0;
+                    dir = Direction.Down;
+                    //RakeRandomly(b, x, y, mark, Direction.Down);
+                }
+                else if ((gene.Start >= b.X) && (gene.Start < (b.X + b.Y)))
+                {
+                    //the right side
+                    //Console.WriteLine(" {0} => right side", gene.ToString());
+                    x = b.X - 1;
+                    y = gene.Start % b.X;
+                    dir = Direction.Left;
+
+                }
+                else if ((gene.Start >= (b.X + b.Y)) && (gene.Start < (b.X + b.X + b.Y)))
+                {
+                    //the lower side
+                    //Console.WriteLine(" {0} => lower side", gene.ToString());
+                    x = b.X - (gene.Start % (b.X + b.Y)) - 1;
+                    y = b.Y - 1;
+                    dir = Direction.Up;
+                }
+                else if ((gene.Start >= (b.X + b.X + b.Y)) && (gene.Start < 2 * (b.X + b.Y)))
+                {
+                    //the left side
+                    //Console.WriteLine(" {0} => left side", gene.ToString());
+                    x = 0;
+                    y = b.Y - (gene.Start % (b.X + b.X + b.Y)) - 1;
+                    dir = Direction.Right;
+                }
+                else
+                {
+                    //error
+                    Console.WriteLine("ERROR: {0}", gene.ToString());
+                    throw new Exception("Gene.Start out of range");
+                }
+
+                int raked = Rake(b,gene.TurnsRight, x, y, mark, dir);
+                if (raked > 0)
+                {
                     ++i;
                     sum += raked;
                     //.RakedSurfaceMap = b.ToString();

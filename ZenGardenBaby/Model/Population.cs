@@ -36,7 +36,7 @@ namespace ZenGardenBaby.Model
                 //zatial 15 krokov generujem
                 int circ = Board.Circumference();
                 var monk = new Monk(circ / 2, circ, new Random());
-                monk.EvaluateOn(Board);
+                monk.EvaluateOnRandomly(Board);
                 Chromosomes.Add(monk);
             }
             Sort();
@@ -50,24 +50,10 @@ namespace ZenGardenBaby.Model
                 //zatial 15 krokov generujem
                 int circ = Board.Circumference();
                 var monk = new Monk(circ / 2, circ, randomizer);
-                monk.EvaluateOn(Board);
+                monk.EvaluateOnRandomly(Board);
                 Chromosomes.Add(monk);
             }
             Sort();
-        }
-
-
-        public void Tournament(int group_size)
-        {
-            //rozdel na skupiny po x, vyber najlepsieho z kazdej a 
-            //tych posli dalej
-
-            throw new NotImplementedException();
-        }
-
-        private Monk Best(List<Monk> chromosomes)
-        {
-            throw new NotImplementedException();
         }
 
         public List<Monk> Elites(double percent)
@@ -77,13 +63,18 @@ namespace ZenGardenBaby.Model
             if(percent > 1 || percent < 0)
                 throw new ArgumentException("Argument must be in <0,1> interval");
             int count =(int) (percent * Chromosomes.Count);
-            result.AddRange(Chromosomes.Take(count)); 
+            result.AddRange(Chromosomes.Take(count));
+            //aby sa elity nezapocitali dalej
+            Chromosomes.RemoveRange(0, count);
             return result;
         }
 
-        public List<Gene> Roulette(double percent)
+        public void EvaluateAllRandomly()
         {
-            throw new NotImplementedException();
+            foreach (var chrom in Chromosomes)
+            {
+                chrom.EvaluateOnRandomly(Board);
+            }
         }
 
         public void EvaluateAll()
@@ -104,7 +95,7 @@ namespace ZenGardenBaby.Model
                 Monk father = Chromosomes.ElementAt(randomizer.Next(Chromosomes.Count));
 
                 var kid = new Monk(mother, father);
-                kid.Mutate();
+                kid.Mutate(randomizer);
 
                 Chromosomes.Add(kid);
             }
@@ -119,6 +110,15 @@ namespace ZenGardenBaby.Model
                         return m2.Fitness.CompareTo(m1.Fitness);
                     }
              );
+        }
+
+        public void Selection(double percent_elites,ISelectionStrategy strategy)
+        {
+            List<Monk> res = new List<Monk>();
+            res.AddRange(Elites(percent_elites));
+            res.AddRange(strategy.Selection(this));
+            Chromosomes.Clear();
+            Chromosomes.AddRange(res);
         }
 
         public override string ToString()

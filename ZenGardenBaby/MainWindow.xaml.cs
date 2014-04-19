@@ -111,8 +111,8 @@ namespace ZenGardenBaby
             if (board != null)
             {
                 var args = new List<object>();
-                args.Add(1000);
-                args.Add(board.Surface());
+                args.Add(300);
+                args.Add(board.Surface() - board.Stones.Count);
                 bw.RunWorkerAsync(args); 
             }
             else
@@ -149,12 +149,15 @@ namespace ZenGardenBaby
 
                 while ((i < loops) && (pop.Chromosomes.ElementAt(0).Fitness != (double)surface))
                 {
-                    IEnumerable<Monk> elite = pop.Elites(0.5);
-                    pop.Chromosomes.Clear();
-                    pop.Chromosomes.AddRange(elite);
+                    //IEnumerable<Monk> elite = pop.Elites(0.1);
+                    //pop.Chromosomes.Clear();
+                    //pop.Chromosomes.AddRange(elite);
+                    //pop.Breed(rand);
+                    //pop.EvaluateAllRandomly();
+                    //pop.Sort();
+                    pop.Selection(0.1,new JustElites());
                     pop.Breed(rand);
                     pop.EvaluateAll();
-                    pop.Sort();
                     i++;
                     worker.ReportProgress(0, pop.ToString());
                 } 
