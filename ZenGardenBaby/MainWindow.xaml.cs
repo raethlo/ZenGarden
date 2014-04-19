@@ -24,10 +24,15 @@ namespace ZenGardenBaby
     {
         private Random rand = new Random();
         private Board board = null;
+        BackgroundWorker bw = new BackgroundWorker();
 
         public MainWindow()
         {
             InitializeComponent();
+            bw.DoWork += bw_DoWork;
+            bw.WorkerReportsProgress = true;
+            bw.ProgressChanged += bw_ProgressChanged;
+            bw.RunWorkerCompleted += bw_RunWorkerCompleted;
         }
 
         private void BtnHello_Click(object sender, RoutedEventArgs e)
@@ -35,10 +40,10 @@ namespace ZenGardenBaby
             if (board!=null)
             {
                 int obvod = board.Circumference();
-                //var father = new Monk(obvod / 2 + board.Stones.Count, obvod,rand);
-                //var mother = new Monk(obvod / 2 + board.Stones.Count, obvod,rand);
-                var father = new Monk(obvod / 4, obvod, rand);
-                var mother = new Monk(obvod / 4, obvod, rand);
+                var father = new Monk(obvod / 2 + board.Stones.Count, obvod, rand);
+                var mother = new Monk(obvod / 2 + board.Stones.Count, obvod, rand);
+                //var father = new Monk(obvod / 4, obvod, rand);
+                //var mother = new Monk(obvod / 4, obvod, rand);
                 father.EvaluateOn(board);
                 AppendLine("FATHER");
                 AppendLine("Fitness = " + father.Fitness.ToString());
@@ -78,9 +83,10 @@ namespace ZenGardenBaby
             }
             try
             {
-                board.LoadFromFile("../../Boards/test1.txt");
+                board.LoadFromFile("../../Boards/1.txt");
                 AppendLine(board.X.ToString() + " " + board.Y.ToString());
                 AppendLine(board.ToString());
+                AppendLine("Surface = " + board.Surface());
             }
             catch (Exception ex)
             {       
@@ -91,52 +97,80 @@ namespace ZenGardenBaby
         private void AppendLine(string text)
         {
             t.AppendText(text + "\n");
+            ScrollViewer.ScrollToEnd();
         }
         private void AppendLine()
         {
             t.AppendText("\n");
+            ScrollViewer.ScrollToEnd();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //BackgroundWorker bw = new BackgroundWorker();
-            ////Thread t = new Thread();
-            //bw.DoWork += bw_DoWork;
-            ////bw.ReportPr
-            //bw.RunWorkerAsync(this);
-
-            Monk father = new Monk(8, 14, rand);
-            Monk mother = new Monk(8, 14, rand);
-
-
-            Console.WriteLine("----Father");
-            foreach (var gene in father.Chromosome)
+            
+            if (board != null)
             {
-                Console.WriteLine(gene.ToString());
+                var args = new List<object>();
+                args.Add(1000);
+                args.Add(board.Surface());
+                bw.RunWorkerAsync(args); 
             }
-
-            Console.WriteLine("----Mother");
-            foreach (var gene in mother.Chromosome)
+            else
             {
-                Console.WriteLine(gene.ToString());
-            }
-
-            Console.WriteLine("----Kid");
-            var kid = new Monk(mother, father);
-            foreach (var gene in kid.Chromosome)
-            {
-                Console.WriteLine(gene.ToString());
+                MessageBox.Show("board not loaded yet");
             }
             
         }
 
+        void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            AppendLine(e.UserState.ToString());
+
+        }
+
+        void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            for (int i = 0; i < 1000000; i++)
+            var worker = sender as BackgroundWorker;
+            List<object> args= e.Argument as List<object>;
+            int loops = (int)args.ElementAt(0);
+            int surface = (int) args.ElementAt(1);
+
+            if (board != null)
             {
-                int k = 2 * i + i ^ 2;
+                int i = 0;
+                Population pop = new Population(board);
+                pop.GenerateFirstPopulation(200, rand);
+                worker.ReportProgress(0, pop.ToString());
+
+                while ((i < loops) && (pop.Chromosomes.ElementAt(0).Fitness != (double)surface))
+                {
+                    IEnumerable<Monk> elite = pop.Elites(0.5);
+                    pop.Chromosomes.Clear();
+                    pop.Chromosomes.AddRange(elite);
+                    pop.Breed(rand);
+                    pop.EvaluateAll();
+                    pop.Sort();
+                    i++;
+                    worker.ReportProgress(0, pop.ToString());
+                } 
+            }
+            else
+            {
+                MessageBox.Show("Board not yet loaded");
             }
         }
+
+        private void BtnClear_Click(object sender, RoutedEventArgs e)
+        {
+            t.Clear();
+        }
+
+
 
     }
 }

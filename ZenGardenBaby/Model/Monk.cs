@@ -88,28 +88,130 @@ namespace ZenGardenBaby.Model
             Chromosome.Reverse(pos, 2);
         }
 
-        protected int Rake(Board b,Gene g, int start_x,int start_y, char mark, Direction dir)
+        protected int Rake(Board b,bool turnsRight, int start_x,int start_y, char mark, Direction dir)
         {
             int x = start_x;
             int y = start_y;
-            while (true)
-            {
-                switch (dir)
-                {
-                    case Direction.Up:
-                        break;
-                    case Direction.Down:
+            int new_x;
+            int new_y;
+            Random rand = new Random();
+            int raked = 0;
 
-                        break;
-                    case Direction.Right:
-                        break;
-                    case Direction.Left:
-                        break;
-                    default:
-                        break;
+            while ((x >= 0) && (x < b.X) && (y >= 0) && (y < b.Y))
+            {
+                if (b.Map[x, y] == Board.Nothing)
+                {
+                    b.Map[x, y] = mark;
+                    ++raked;
+
+                    switch (dir)
+                    {
+                        case Direction.Up:
+                            new_y = y - 1;
+                            if (new_y < 0)
+                                return raked;
+                            else if (b.Map[x, new_y] != Board.Nothing)
+                            {
+                                
+                                if (!turnsRight && ((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing)
+                                {
+                                    dir = Direction.Left;
+                                    x--;
+                                    continue;
+                                }
+                                else if (turnsRight && (((x + 1) == b.X) || b.Map[x + 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Right;
+                                    x++;
+                                    continue;
+                                }
+                            }
+                            y = new_y;
+                            break;
+                        case Direction.Down:
+                            new_y = y + 1;
+                            if (new_y == b.Y)
+                                return raked;
+                            //ak nie je volno
+                            else if (b.Map[x, new_y] != Board.Nothing)
+                            {
+                                //pozri vlavo, pre mnicha iduceho dole je to vpravo
+                                if (turnsRight && (((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Left;
+                                    x--;
+                                    continue;
+                                }
+                                //pozri vpravo
+                                else if (!turnsRight && (((x + 1) == b.X) || b.Map[x + 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Right;
+                                    x++;
+                                    continue;
+                                }
+                            }
+                            y = new_y;
+                            break;
+                        case Direction.Right:
+                            new_x = x + 1;
+                            //return 1;
+                            if (new_x == b.X)
+                                return raked;
+                            else if (b.Map[new_x, y] != Board.Nothing)
+                            {
+                                //pozri hore
+                                if (!turnsRight && (((y - 1) < 0) || b.Map[x, y - 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Up;
+                                    y--;
+                                    continue;
+                                }
+                                //pozri dole
+                                else if (turnsRight && (((y + 1) == b.Y) || b.Map[x, y + 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Down;
+                                    y++;
+                                    continue;
+                                }
+                            }
+                            x = new_x;
+                            break;
+                        case Direction.Left:
+                            new_x = x - 1;
+                            //return 1;
+                            if (new_x < 0)
+                                return raked;
+                            else if (b.Map[new_x, y] != Board.Nothing)
+                            {
+                                //pozri hore
+                                if (turnsRight && (((y - 1) < 0) || b.Map[x, y - 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Up;
+                                    y--;
+                                    continue;
+                                }
+                                //pozri dole
+                                else if (!turnsRight && (((y + 1) == b.Y) || b.Map[x, y + 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Down;
+                                    y++;
+                                    continue;
+                                }
+                            }
+                            x = new_x;
+                            //return 1;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                
+                else
+                {
+                    return 0;
+                }
+
             }
+            return raked;
         }
 
         protected int RakeRandomly(Board b, int start_x, int start_y, char mark, Direction dir)
@@ -242,7 +344,7 @@ namespace ZenGardenBaby.Model
             double fitness = 0.0 ;
             var a = Encoding.ASCII.GetBytes("a")[0];
             //poprechadzaj celu mapu podla instrukcii, pojde to postupne, kedze list je zoradeny
-            Console.WriteLine("X= {0} Y={1} obvod={2}", b.X, b.Y, 2 * (b.X + b.Y));
+            //Console.WriteLine("X= {0} Y={1} obvod={2}", b.X, b.Y, 2 * (b.X + b.Y));
             byte i = 0;
             int y = -1;
             int x = -1;
@@ -259,7 +361,7 @@ namespace ZenGardenBaby.Model
                 if (gene.Start < b.X)
                 {
                     //this is case when the monk is entering from the upper side
-                    Console.WriteLine(" {0} => upper side",gene.ToString());
+                    //Console.WriteLine(" {0} => upper side",gene.ToString());
                     x = gene.Start;
                     y = 0;
                     dir = Direction.Down;
@@ -268,7 +370,7 @@ namespace ZenGardenBaby.Model
                 else if ( (gene.Start>= b.X) && (gene.Start < (b.X+b.Y)) )
                 {
                     //the right side
-                    Console.WriteLine(" {0} => right side", gene.ToString());
+                    //Console.WriteLine(" {0} => right side", gene.ToString());
                     x = b.X - 1;
                     y = gene.Start % b.X;
                     dir = Direction.Left;
@@ -277,7 +379,7 @@ namespace ZenGardenBaby.Model
                 else if ((gene.Start >= (b.X + b.Y)) && (gene.Start < (b.X + b.X + b.Y)))
                 {
                     //the lower side
-                    Console.WriteLine(" {0} => lower side", gene.ToString());
+                    //Console.WriteLine(" {0} => lower side", gene.ToString());
                     x = b.X - (gene.Start % (b.X+b.Y)) - 1;
                     y = b.Y - 1;
                     dir = Direction.Up;
@@ -285,7 +387,7 @@ namespace ZenGardenBaby.Model
                 else if ((gene.Start >= (b.X + b.X + b.Y)) && (gene.Start < 2 * (b.X + b.Y)))
                 {
                     //the left side
-                    Console.WriteLine(" {0} => left side", gene.ToString());
+                    //Console.WriteLine(" {0} => left side", gene.ToString());
                     x = 0;
                     y = b.Y - (gene.Start % (b.X + b.X + b.Y)) - 1 ;
                     dir = Direction.Right;
@@ -301,8 +403,8 @@ namespace ZenGardenBaby.Model
                 if (raked > 0){
                     ++i;
                     sum += raked;
-                    this.RakedSurfaceMap = b.ToString();
-                    Console.WriteLine(PrintResult());
+                    //.RakedSurfaceMap = b.ToString();
+                    //Console.WriteLine(PrintResult());
                 }
             }
 
