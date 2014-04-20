@@ -91,11 +91,23 @@ namespace ZenGardenBaby.Model
         public void Breed(Random randomizer,double mutation_chance)
         {
             int count = Size - Chromosomes.Count;
+            List<int> used = new List<int>();
 
             for (int i = 0; i < count; i++)
             {
-                Monk mother = Chromosomes.ElementAt(randomizer.Next(Chromosomes.Count));
-                Monk father = Chromosomes.ElementAt(randomizer.Next(Chromosomes.Count));
+                int m = -1;
+                int t = -1;
+                do
+                {
+                    m = randomizer.Next(Chromosomes.Count);
+                } while (used.Contains(m));
+                do
+                {
+                    t = randomizer.Next(Chromosomes.Count);
+                } while (used.Contains(t));
+
+                Monk mother = Chromosomes.ElementAt(m);
+                Monk father = Chromosomes.ElementAt(t);
 
                 Monk kid = null;
 
@@ -148,16 +160,16 @@ namespace ZenGardenBaby.Model
             sb.AppendFormat("AVG = {0} MAX = {1} MIN = {2}\n", avg_fitness, max_fitness, min_fitness);
             sb.AppendLine(Chromosomes.ElementAt(0).PrintResult());
 
-            File.AppendAllText("avg.txt", avg_fitness.ToString()+"\n");
-            File.AppendAllText("max.txt", max_fitness.ToString() + "\n");
+            File.AppendAllText("avg_fitness.txt", avg_fitness.ToString()+"\n");
+            File.AppendAllText("max_fitness.txt", max_fitness.ToString() + "\n");
             List<double> first_ten_fitnes = new List<double>();
             first_ten_fitnes.AddRange(Chromosomes.Select(m => m.Fitness).Take(10));
 
             foreach (var f in first_ten_fitnes)
             {
-                File.AppendAllText("ftf.txt",f.ToString() + " ");
+                File.AppendAllText("ftf_result.txt",f.ToString() + " ");
             }
-            File.AppendAllText("ftf.txt","\n");
+            File.AppendAllText("ftf_result.txt", "\n");
 
             return sb.ToString();
 

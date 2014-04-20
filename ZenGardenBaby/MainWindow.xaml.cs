@@ -98,9 +98,13 @@ namespace ZenGardenBaby
                         //board.LoadFromFile("../../Boards/test1.txt");
                         board.LoadFromFile(openFileDialog1.FileName);
 
-                        File.Create("ftf.txt");
-                        File.Create("avg.txt");
-                        File.Create("max.txt");
+                        if (File.Exists("ftf_result.txt"))
+                            File.Delete("ftf_result.txt");
+                        if (File.Exists("avg_fitness.txt"))
+                            File.Delete("avg_fitness.txt");
+                        if (File.Exists("max_fitness.txt"))
+                            File.Delete("max_fitness.txt");
+
                         AppendLine(board.X.ToString() + " " + board.Y.ToString());
                         AppendLine(board.ToString());
                         AppendLine("Surface = " + board.Surface());
@@ -131,6 +135,12 @@ namespace ZenGardenBaby
             {
                 if ((!bw.IsBusy))
                 {
+                    if (File.Exists("ftf_result.txt"))
+                        File.Delete("ftf_result.txt");
+                    if (File.Exists("avg_fitness.txt"))
+                        File.Delete("avg_fitness.txt");
+                    if (File.Exists("max_fitness.txt"))
+                        File.Delete("max_fitness.txt");
                     var args = new List<object>();
                     args.Add(5000);
                     int voila = board.Surface() - board.Stones.Count;
@@ -181,7 +191,7 @@ namespace ZenGardenBaby
             {
                 int i = 0;
                 Population pop = new Population(board);
-                pop.GenerateFirstPopulation(1000, rand);
+                pop.GenerateFirstPopulation(5, rand);
                 worker.ReportProgress(0, pop.ToString());
 
                 

@@ -13,7 +13,7 @@ namespace ZenGardenBaby.Model
         public int Y { get; set; }
         public char[,] Map { get; set; }
         public List<Obstacle> Stones { get; set; }
-        public const char Nothing = '0';
+        public const char Nothing = '_';
 
         public Board()
         {
@@ -58,7 +58,7 @@ namespace ZenGardenBaby.Model
             {
                 for (int j = 0; j < this.X; j++)
                 {
-                    this.Map[j, i] = '0';
+                    this.Map[j, i] = Board.Nothing; 
                 }
             }
         }

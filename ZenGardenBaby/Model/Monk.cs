@@ -134,7 +134,7 @@ namespace ZenGardenBaby.Model
                 {
                     b.Map[x, y] = mark;
                     ++raked;
-
+                }
                     switch (dir)
                     {
                         case Direction.Up:
@@ -286,11 +286,11 @@ namespace ZenGardenBaby.Model
                         default:
                             break;
                     }
-                }
-                else
-                {
-                    return 0;
-                }
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
 
             }
             return raked;
