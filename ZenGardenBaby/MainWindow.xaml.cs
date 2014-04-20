@@ -191,7 +191,7 @@ namespace ZenGardenBaby
             {
                 int i = 0;
                 Population pop = new Population(board);
-                pop.GenerateFirstPopulation(5, rand);
+                pop.GenerateFirstPopulation(50, rand);
                 worker.ReportProgress(0, pop.ToString());
 
                 

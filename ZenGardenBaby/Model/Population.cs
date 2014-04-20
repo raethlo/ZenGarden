@@ -65,6 +65,11 @@ namespace ZenGardenBaby.Model
             if(percent > 1 || percent < 0)
                 throw new ArgumentException("Argument must be in <0,1> interval");
             int count =(int) (percent * Chromosomes.Count);
+            if (count == 0)
+            {
+                result.Add(Chromosomes.First());
+                result.RemoveAt(0);
+            }
             result.AddRange(Chromosomes.Take(count));
             //aby sa elity nezapocitali dalej
             Chromosomes.RemoveRange(0, count);
@@ -91,20 +96,26 @@ namespace ZenGardenBaby.Model
         public void Breed(Random randomizer,double mutation_chance)
         {
             int count = Size - Chromosomes.Count;
-            List<int> used = new List<int>();
+            //List<int> used = new List<int>();
+            List<Monk> children = new List<Monk>();
 
             for (int i = 0; i < count; i++)
             {
                 int m = -1;
                 int t = -1;
-                do
-                {
-                    m = randomizer.Next(Chromosomes.Count);
-                } while (used.Contains(m));
-                do
-                {
-                    t = randomizer.Next(Chromosomes.Count);
-                } while (used.Contains(t));
+                //do
+                //{
+                //    m = randomizer.Next(Chromosomes.Count);
+                //} while (used.Contains(m));
+                //used.Add(m);
+                //do
+                //{
+                //    t = randomizer.Next(Chromosomes.Count);
+                //} while (used.Contains(t));
+                //used.Add(t);
+
+                m = randomizer.Next(Chromosomes.Count);
+                t = randomizer.Next(Chromosomes.Count);
 
                 Monk mother = Chromosomes.ElementAt(m);
                 Monk father = Chromosomes.ElementAt(t);
@@ -121,8 +132,11 @@ namespace ZenGardenBaby.Model
                 }
                 kid.Mutate(randomizer,mutation_chance);
                 kid.EvaluateOn(Board);
-                Chromosomes.Add(kid);
+                //Chromosomes.Add(kid);
+                children.Add(kid);
             }
+
+            Chromosomes.AddRange(children);
 
         }
 

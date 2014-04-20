@@ -9,12 +9,17 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.CanContentScroll="True" FontFamily="Courier New"/>
         </ScrollViewer>
-        <StackPanel>
+        <StackPanel Margin="0,10,0,0" Width="377">
             <StackPanel>
-                <Button Name="BtnLoad" Content="Load board..." HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Click="BtnLoad_Click"/>
+                <Button Name="BtnLoad" Content="Load board..." HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="BtnLoad_Click"/>
             </StackPanel>
-            <Button Content="Run simulation" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="100"  Click="Button_Click"/>
-            <Button Name="BtnClear" Content="Clear text" Width="100" VerticalAlignment="Top" Click="BtnClear_Click" />
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Run simulation" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="100"  Click="Button_Click"/>
+            </StackPanel>
+            <Button Name="BtnClear" Content="Clear text" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnClear_Click" />
+        <Label Content="Runtime"/>
+        <TextBlock TextWrapping="Wrap" Text="5000"/>
         </StackPanel>
+        
     </StackPanel>
 </Window>

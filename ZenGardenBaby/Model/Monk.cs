@@ -134,7 +134,7 @@ namespace ZenGardenBaby.Model
                 {
                     b.Map[x, y] = mark;
                     ++raked;
-                }
+
                     switch (dir)
                     {
                         case Direction.Up:
@@ -143,7 +143,7 @@ namespace ZenGardenBaby.Model
                                 return raked;
                             else if (b.Map[x, new_y] != Board.Nothing)
                             {
-                                
+
                                 if (!turnsRight && (((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing))
                                 {
                                     dir = Direction.Left;
@@ -168,6 +168,8 @@ namespace ZenGardenBaby.Model
                                     x++;
                                     continue;
                                 }
+                                else
+                                    return -1;
                             }
                             y = new_y;
                             break;
@@ -205,6 +207,8 @@ namespace ZenGardenBaby.Model
                                     x++;
                                     continue;
                                 }
+                                else
+                                    return -1;
                             }
                             y = new_y;
                             break;
@@ -242,6 +246,8 @@ namespace ZenGardenBaby.Model
                                     y++;
                                     continue;
                                 }
+                                else
+                                    return -1;
                             }
                             x = new_x;
                             break;
@@ -279,6 +285,8 @@ namespace ZenGardenBaby.Model
                                     y++;
                                     continue;
                                 }
+                                else
+                                    return -1;
                             }
                             x = new_x;
                             //return 1;
@@ -286,11 +294,11 @@ namespace ZenGardenBaby.Model
                         default:
                             break;
                     }
-                //}
-                //else
-                //{
-                //    return 0;
-                //}
+                }
+                else
+                {
+                    return raked;
+                }
 
             }
             return raked;
@@ -482,12 +490,15 @@ namespace ZenGardenBaby.Model
                 }
 
                 int raked = RakeRandomly(b, x, y, mark, dir);
-                if (raked > 0){
+                if (raked > 0)
+                {
                     ++i;
                     sum += raked;
                     //.RakedSurfaceMap = b.ToString();
                     //Console.WriteLine(PrintResult());
                 }
+                else if (raked == (-1))
+                    break;
             }
 
 
