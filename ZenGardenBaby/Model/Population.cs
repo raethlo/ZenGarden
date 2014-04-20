@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace ZenGardenBaby.Model
 {
@@ -35,8 +36,9 @@ namespace ZenGardenBaby.Model
             {
                 //zatial 15 krokov generujem
                 int circ = Board.Circumference();
-                var monk = new Monk(circ / 2, circ, new Random());
-                monk.EvaluateOnRandomly(Board);
+                var monk = new Monk(circ / 2 + Board.Stones.Count, circ, new Random());
+                //monk.EvaluateOnRandomly(Board);
+                monk.EvaluateOn(Board);
                 Chromosomes.Add(monk);
             }
             Sort();
@@ -49,7 +51,7 @@ namespace ZenGardenBaby.Model
             {
                 //zatial 15 krokov generujem
                 int circ = Board.Circumference();
-                var monk = new Monk(circ / 2, circ, randomizer);
+                var monk = new Monk(circ / 2 + Board.Stones.Count, circ, randomizer);
                 monk.EvaluateOnRandomly(Board);
                 Chromosomes.Add(monk);
             }
@@ -83,9 +85,10 @@ namespace ZenGardenBaby.Model
             {
                 chrom.EvaluateOn(Board);
             }
+            Sort();
         }
 
-        public void Breed(Random randomizer)
+        public void Breed(Random randomizer,double mutation_chance)
         {
             int count = Size - Chromosomes.Count;
 
@@ -94,9 +97,18 @@ namespace ZenGardenBaby.Model
                 Monk mother = Chromosomes.ElementAt(randomizer.Next(Chromosomes.Count));
                 Monk father = Chromosomes.ElementAt(randomizer.Next(Chromosomes.Count));
 
-                var kid = new Monk(mother, father);
-                kid.Mutate(randomizer);
+                Monk kid = null;
 
+                if (randomizer.Next(2) == 1)
+                {
+                    kid = new Monk(mother, father); 
+                }
+                else
+                {
+                    kid = new Monk(father, mother);
+                }
+                kid.Mutate(randomizer,mutation_chance);
+                kid.EvaluateOn(Board);
                 Chromosomes.Add(kid);
             }
 
@@ -112,10 +124,13 @@ namespace ZenGardenBaby.Model
              );
         }
 
-        public void Selection(double percent_elites,ISelectionStrategy strategy)
+        public void Selection(double percent_elites,ISelectionStrategy strategy, bool elitarism_on)
         {
             List<Monk> res = new List<Monk>();
-            res.AddRange(Elites(percent_elites));
+            if (elitarism_on)
+            {
+                res.AddRange(Elites(percent_elites)); 
+            }
             res.AddRange(strategy.Selection(this));
             Chromosomes.Clear();
             Chromosomes.AddRange(res);
@@ -132,6 +147,17 @@ namespace ZenGardenBaby.Model
 
             sb.AppendFormat("AVG = {0} MAX = {1} MIN = {2}\n", avg_fitness, max_fitness, min_fitness);
             sb.AppendLine(Chromosomes.ElementAt(0).PrintResult());
+
+            File.AppendAllText("avg.txt", avg_fitness.ToString()+"\n");
+            File.AppendAllText("max.txt", max_fitness.ToString() + "\n");
+            List<double> first_ten_fitnes = new List<double>();
+            first_ten_fitnes.AddRange(Chromosomes.Select(m => m.Fitness).Take(10));
+
+            foreach (var f in first_ten_fitnes)
+            {
+                File.AppendAllText("ftf.txt",f.ToString() + " ");
+            }
+            File.AppendAllText("ftf.txt","\n");
 
             return sb.ToString();
 

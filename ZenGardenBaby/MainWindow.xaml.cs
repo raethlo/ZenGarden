@@ -13,7 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 using ZenGardenBaby.Model;
+using Microsoft.Win32;
 
 namespace ZenGardenBaby
 {
@@ -76,21 +78,38 @@ namespace ZenGardenBaby
 
         private void BtnLoad_Click(object sender, RoutedEventArgs e)
         {
-            
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            openFileDialog1.InitialDirectory = "c:\\";
+            openFileDialog1.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+
             if (board == null)
             {
                 board = new Board(); 
             }
-            try
+            if (openFileDialog1.ShowDialog() == true)
             {
-                board.LoadFromFile("../../Boards/1.txt");
-                AppendLine(board.X.ToString() + " " + board.Y.ToString());
-                AppendLine(board.ToString());
-                AppendLine("Surface = " + board.Surface());
-            }
-            catch (Exception ex)
-            {       
-                MessageBox.Show(ex.Message);
+                try
+                {
+                    if (!openFileDialog1.FileName.Equals(null))
+                    {
+                        //board.LoadFromFile("../../Boards/test1.txt");
+                        board.LoadFromFile(openFileDialog1.FileName);
+
+                        File.Create("ftf.txt");
+                        File.Create("avg.txt");
+                        File.Create("max.txt");
+                        AppendLine(board.X.ToString() + " " + board.Y.ToString());
+                        AppendLine(board.ToString());
+                        AppendLine("Surface = " + board.Surface());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                } 
             }
         }
 
@@ -110,10 +129,18 @@ namespace ZenGardenBaby
             
             if (board != null)
             {
-                var args = new List<object>();
-                args.Add(300);
-                args.Add(board.Surface() - board.Stones.Count);
-                bw.RunWorkerAsync(args); 
+                if ((!bw.IsBusy))
+                {
+                    var args = new List<object>();
+                    args.Add(5000);
+                    int voila = board.Surface() - board.Stones.Count;
+                    args.Add(voila);
+                    bw.RunWorkerAsync(args); 
+                } 
+                else
+                {
+                    MessageBox.Show("in progress");
+                }
             }
             else
             {
@@ -124,13 +151,23 @@ namespace ZenGardenBaby
 
         void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            //var pop = e.UserState as Population;
+
             AppendLine(e.UserState.ToString());
 
         }
 
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //throw new NotImplementedException();
+            int res = (int)e.Result;
+            if ( (res) == (-1))
+            {
+                AppendLine("Solution couldn't be found in given time with given method");
+            }
+            else
+            {
+                AppendLine(String.Format("Solution found in {0}. iteration",res));
+            }
         }
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -144,23 +181,25 @@ namespace ZenGardenBaby
             {
                 int i = 0;
                 Population pop = new Population(board);
-                pop.GenerateFirstPopulation(200, rand);
+                pop.GenerateFirstPopulation(1000, rand);
                 worker.ReportProgress(0, pop.ToString());
 
-                while ((i < loops) && (pop.Chromosomes.ElementAt(0).Fitness != (double)surface))
+                
+                while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals((double)surface)) )
                 {
-                    //IEnumerable<Monk> elite = pop.Elites(0.1);
-                    //pop.Chromosomes.Clear();
-                    //pop.Chromosomes.AddRange(elite);
-                    //pop.Breed(rand);
+                    pop.Selection(0.05, new TournamentSelection(),true);
+                    pop.Breed(rand,0.4);
                     //pop.EvaluateAllRandomly();
-                    //pop.Sort();
-                    pop.Selection(0.1,new JustElites());
-                    pop.Breed(rand);
-                    pop.EvaluateAll();
+                    pop.Sort();
                     i++;
                     worker.ReportProgress(0, pop.ToString());
-                } 
+                }
+                if (i != loops)
+                {
+                    e.Result = i;
+                }
+                else
+                    e.Result = -1;
             }
             else
             {

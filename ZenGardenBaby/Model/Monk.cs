@@ -88,13 +88,35 @@ namespace ZenGardenBaby.Model
             Chromosome.Reverse(pos, 2);
         }
 
-        public void Mutate(Random randomizer)
+        public void Mutate(Random randomizer, double percent)
         {
             //mozno rozne mutacie, 
             //zatial vymenim nahodne dva geny vedla seba
-            int pos = randomizer.Next(Chromosome.Count - 1);
-            Console.WriteLine(pos);
-            Chromosome.Reverse(pos, 2);
+            if (randomizer.NextDouble()<=percent)
+            {
+                int pos = randomizer.Next(Chromosome.Count - 1);
+
+                Chromosome.Reverse(pos, 2);
+                pos = randomizer.Next(Chromosome.Count);
+
+
+                pos = randomizer.Next(Chromosome.Count);
+                bool tr = Chromosome.ElementAt(pos).TurnsRight;
+                Chromosome.ElementAt(pos).TurnsRight = !tr;
+
+                pos = randomizer.Next(Chromosome.Count);
+
+                tr = randomizer.Next(2) == 1 ? true : false;
+                int start = randomizer.Next(this.Treshold);
+                while (null != Chromosome.Where(t => t.Start == start).FirstOrDefault())
+                {
+                    start  = randomizer.Next(this.Treshold);
+                }
+                pos = randomizer.Next(Chromosome.Count);
+                Chromosome.ElementAt(pos).Start = start;
+
+            }
+            
         }
 
         protected int Rake(Board b,bool turnsRight, int start_x,int start_y, char mark, Direction dir)
@@ -134,6 +156,18 @@ namespace ZenGardenBaby.Model
                                     x++;
                                     continue;
                                 }
+                                else if (turnsRight && (((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Left;
+                                    x--;
+                                    continue;
+                                }
+                                else if (!turnsRight && (((x + 1) == b.X) || b.Map[x + 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Right;
+                                    x++;
+                                    continue;
+                                }
                             }
                             y = new_y;
                             break;
@@ -153,6 +187,19 @@ namespace ZenGardenBaby.Model
                                 }
                                 //pozri vpravo
                                 else if (!turnsRight && (((x + 1) == b.X) || b.Map[x + 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Right;
+                                    x++;
+                                    continue;
+                                }
+                                else if (!turnsRight && (((x - 1) < 0) || b.Map[x - 1, y] == Board.Nothing))
+                                {
+                                    dir = Direction.Left;
+                                    x--;
+                                    continue;
+                                }
+                                //pozri vpravo
+                                else if (turnsRight && (((x + 1) == b.X) || b.Map[x + 1, y] == Board.Nothing))
                                 {
                                     dir = Direction.Right;
                                     x++;
@@ -182,6 +229,19 @@ namespace ZenGardenBaby.Model
                                     y++;
                                     continue;
                                 }
+                                else if (turnsRight && (((y - 1) < 0) || b.Map[x, y - 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Up;
+                                    y--;
+                                    continue;
+                                }
+                                //pozri dole
+                                else if (!turnsRight && (((y + 1) == b.Y) || b.Map[x, y + 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Down;
+                                    y++;
+                                    continue;
+                                }
                             }
                             x = new_x;
                             break;
@@ -201,6 +261,19 @@ namespace ZenGardenBaby.Model
                                 }
                                 //pozri dole
                                 else if (!turnsRight && (((y + 1) == b.Y) || b.Map[x, y + 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Down;
+                                    y++;
+                                    continue;
+                                }
+                                else if (!turnsRight && (((y - 1) < 0) || b.Map[x, y - 1] == Board.Nothing))
+                                {
+                                    dir = Direction.Up;
+                                    y--;
+                                    continue;
+                                }
+                                //pozri dole
+                                else if (turnsRight && (((y + 1) == b.Y) || b.Map[x, y + 1] == Board.Nothing))
                                 {
                                     dir = Direction.Down;
                                     y++;
