@@ -191,14 +191,14 @@ namespace ZenGardenBaby
             {
                 int i = 0;
                 Population pop = new Population(board);
-                pop.GenerateFirstPopulation(50, rand);
+                pop.GenerateFirstPopulation(100, rand);
                 worker.ReportProgress(0, pop.ToString());
 
                 
                 while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals((double)surface)) )
                 {
                     pop.Selection(0.05, new TournamentSelection(),true);
-                    pop.Breed(rand,0.4);
+                    pop.Breed(rand,0.6);
                     //pop.EvaluateAllRandomly();
                     pop.Sort();
                     i++;
