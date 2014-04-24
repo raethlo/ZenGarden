@@ -10,7 +10,7 @@ namespace ZenGardenBaby.Model
     {
         public List<Gene> Chromosome { get; set; }
         public int Length { get; set; }
-        public double Fitness { get; set; }
+        public int Fitness { get; set; }
         public int Treshold { get; set; }
         private string RakedSurfaceMap = null;
 
@@ -18,7 +18,7 @@ namespace ZenGardenBaby.Model
         {
             Chromosome = new List<Gene>();
             Length = 0;
-            Fitness = 0.0;
+            Fitness = 0;
             Treshold = obvod;
             GenerateRandom(length, obvod, randomizer);
         }
@@ -32,7 +32,7 @@ namespace ZenGardenBaby.Model
             Chromosome = new List<Gene>();
             Length = father.Length;
             Treshold = father.Treshold;
-            Fitness = 0.0;
+            Fitness = 0;
             
             Chromosome.AddRange(mother.Chromosome.Take(Length / 2));
             //var remains = father.Chromosome.Except(Chromosome);
@@ -597,8 +597,8 @@ namespace ZenGardenBaby.Model
 
 
             RakedSurfaceMap = b.ToString();
-            fitness = sum;
-            this.Fitness = fitness;
+            //fitness = sum;
+            this.Fitness = sum;
         }
 
         public string PrintResult()

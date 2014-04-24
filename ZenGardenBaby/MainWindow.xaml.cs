@@ -195,7 +195,7 @@ namespace ZenGardenBaby
                 worker.ReportProgress(0, pop.ToString());
 
                 
-                while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals((double)surface)) )
+                while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals(surface)) )
                 {
                     pop.Selection(0.05, new TournamentSelection(),true);
                     pop.Breed(rand,0.6);

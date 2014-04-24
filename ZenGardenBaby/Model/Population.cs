@@ -169,7 +169,7 @@ namespace ZenGardenBaby.Model
 
             File.AppendAllText("avg_fitness.txt", avg_fitness.ToString() + "\n");
             File.AppendAllText("max_fitness.txt", max_fitness.ToString() + "\n");
-            List<double> first_ten_fitnes = new List<double>();
+            List<int> first_ten_fitnes = new List<int>();
             first_ten_fitnes.AddRange(Chromosomes.Select(m => m.Fitness).Take(10));
 
             foreach (var f in first_ten_fitnes)
