@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ZenGarden" Height="600" Width="800">
     <StackPanel Orientation="Horizontal">
-        <ScrollViewer x:Name="ScrollViewer" HorizontalAlignment="Left" Margin="10,0,0,0"  Width="400">
+        <ScrollViewer x:Name="ScrollViewer" HorizontalAlignment="Left" Margin="10,0,0,0"  Width="638">
             <TextBox x:Name ="t" TextWrapping="Wrap" 
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.CanContentScroll="True" FontFamily="Courier New"/>
         </ScrollViewer>
-        <StackPanel Margin="0,10,0,0" Width="377">
+        <StackPanel Margin="0,10,0,0" Width="135">
             <StackPanel>
                 <Button Name="BtnLoad" Content="Load board..." HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="BtnLoad_Click"/>
             </StackPanel>
@@ -27,9 +27,10 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Mutation rate"/>
-                <TextBox Name="tbMut" TextWrapping="Wrap" Text="0.6" TextChanged="tbMut_TextChanged"/>
+                <TextBox Name="tbMut" TextWrapping="Wrap" Text="0,6" TextChanged="tbMut_TextChanged"/>
             </StackPanel>
             <CheckBox Content="Elitarism on" Name="cbElites" IsChecked="True"/>
+            <Label/>
         </StackPanel>
         
     </StackPanel>

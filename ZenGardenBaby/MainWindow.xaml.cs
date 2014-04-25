@@ -192,7 +192,7 @@ namespace ZenGardenBaby
             var worker = sender as BackgroundWorker;
             List<object> args= e.Argument as List<object>;
             int loops = (int)args.ElementAt(0);
-            int surface = (int) args.ElementAt(1);
+            int max_fitness = (int) args.ElementAt(1);
             elitarism_on = (bool)args.ElementAt(2);
 
             if (board != null)
@@ -203,12 +203,10 @@ namespace ZenGardenBaby
                 worker.ReportProgress(0, pop.ToString());
 
                 
-                while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals(surface)) )
+                while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals(max_fitness)) )
                 {
                     pop.Selection(0.05, selection,elitarism_on);
-                    worker.ReportProgress(0, "elites = " + elitarism_on.ToString());
                     pop.Breed(rand,mutation_chance);
-                    //pop.EvaluateAllRandomly();
                     pop.Sort();
                     i++;
                     worker.ReportProgress(0, pop.ToString());

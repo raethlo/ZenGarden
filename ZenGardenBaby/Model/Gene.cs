@@ -8,10 +8,10 @@ namespace ZenGardenBaby.Model
 {
     class Gene : IEquatable<Gene>
     {
+        //odkial mnich pride na zahradu
         public int Start { get; set; }
+        //preferovany smer pri narazeni na prekazku
         public bool TurnsRight { get; set; }
-        //tu by mohlo byt. ci sa otoci doprava alebo dolava pri rpekazke
-        //public bool MyProperty { get; set; }
 
         public Gene(int value, bool turnsRight)
         {
