@@ -17,8 +17,19 @@
                 <Button Content="Run simulation" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="100"  Click="Button_Click"/>
             </StackPanel>
             <Button Name="BtnClear" Content="Clear text" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnClear_Click" />
-        <Label Content="Runtime"/>
-        <TextBlock TextWrapping="Wrap" Text="5000"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Runtime:"/>
+                <TextBox Name="tbRun" TextWrapping="Wrap" Text="5000" TextChanged="tbRun_TextChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Population size:"/>
+                <TextBox Name="tbPop" TextWrapping="Wrap" Text="100" TextChanged="tbPop_TextChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Mutation rate"/>
+                <TextBox Name="tbMut" TextWrapping="Wrap" Text="0.6" TextChanged="tbMut_TextChanged"/>
+            </StackPanel>
+            <CheckBox Content="Elitarism on" Name="cbElites" IsChecked="True"/>
         </StackPanel>
         
     </StackPanel>

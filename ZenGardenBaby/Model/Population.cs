@@ -11,8 +11,6 @@ namespace ZenGardenBaby.Model
     {
         public List<Monk> Chromosomes { get; set; }
         public int Size { get; set; }
-        //zatial to tu bude ale je to skarede 
-        //posuvat si rozmery boardu takto
         protected Board Board { get; set; }
 
         public Population(Board board)
@@ -34,10 +32,9 @@ namespace ZenGardenBaby.Model
             this.Size = size;
             for (int i = 0; i < size; i++)
             {
-                //zatial 15 krokov generujem
                 int circ = Board.Circumference();
+                //maximalna dlzka genomu podla zadania = obvod/2 + pocet prekazok
                 var monk = new Monk(circ / 2 + Board.Stones.Count, circ, new Random());
-                //monk.EvaluateOnRandomly(Board);
                 monk.EvaluateOn(Board);
                 Chromosomes.Add(monk);
             }
@@ -49,8 +46,8 @@ namespace ZenGardenBaby.Model
             this.Size = size;
             for (int i = 0; i < size; i++)
             {
-                //zatial 15 krokov generujem
                 int circ = Board.Circumference();
+                //maximalna dlzka genomu podla zadania = obvod/2 + pocet prekazok
                 var monk = new Monk(circ / 2 + Board.Stones.Count, circ, randomizer);
                 monk.EvaluateOn(Board);
                 Chromosomes.Add(monk);
@@ -71,18 +68,10 @@ namespace ZenGardenBaby.Model
                 result.RemoveAt(0);
             }
             result.AddRange(Chromosomes.Take(count));
-            //aby sa elity nezapocitali dalej
+            //aby sa elity nezapocitali dalej pri selekcii
             Chromosomes.RemoveRange(0, count);
             return result;
         }
-
-        //public void EvaluateAllRandomly()
-        //{
-        //    foreach (var chrom in Chromosomes)
-        //    {
-        //        chrom.EvaluateOnRandomly(Board);
-        //    }
-        //}
 
         public void EvaluateAll()
         {
@@ -96,7 +85,6 @@ namespace ZenGardenBaby.Model
         public void Breed(Random randomizer, double mutation_chance)
         {
             int count = Size - Chromosomes.Count;
-            //List<int> used = new List<int>();
             List<Monk> children = new List<Monk>();
 
             for (int i = 0; i < count; i++)
@@ -125,7 +113,6 @@ namespace ZenGardenBaby.Model
                 }
                 kid.Mutate(randomizer, mutation_chance);
                 kid.EvaluateOn(Board);
-                //Chromosomes.Add(kid);
                 children.Add(kid);
             }
 
@@ -155,6 +142,7 @@ namespace ZenGardenBaby.Model
             Chromosomes.AddRange(res);
         }
 
+        //v tejto metode pisem aj do externych suborov, aby som z toho mohol robit grafy
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

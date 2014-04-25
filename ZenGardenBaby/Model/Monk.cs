@@ -11,6 +11,7 @@ namespace ZenGardenBaby.Model
         public List<Gene> Chromosome { get; set; }
         public int Length { get; set; }
         public int Fitness { get; set; }
+        //maximalna hodnota, ktoru moze mat vstupne pole
         public int Treshold { get; set; }
         private string RakedSurfaceMap = null;
 
@@ -22,7 +23,8 @@ namespace ZenGardenBaby.Model
             Treshold = obvod;
             GenerateRandom(length, obvod, randomizer);
         }
-
+        
+        //krizenie mnichov
         public Monk(Monk mother, Monk father)
         {
             if(mother.Length != father.Length)
@@ -34,10 +36,12 @@ namespace ZenGardenBaby.Model
             Treshold = father.Treshold;
             Fitness = 0;
             
+            //polovica z matky
             Chromosome.AddRange(mother.Chromosome.Take(Length / 2));
-            //var remains = father.Chromosome.Except(Chromosome);
+            //z otca to, co tam este nie je
             var remains = father.Chromosome.Except(Chromosome);
             Chromosome.AddRange(remains.Take(Length / 2));
+            //ak treba dotvorim nove
             if (Chromosome.Count < Length)
             {
                 int i = Chromosome.Count;
@@ -57,6 +61,7 @@ namespace ZenGardenBaby.Model
             }
         }
 
+        //vygeneruje nahodneho mnicha
         protected void GenerateRandom(int length,int obvod,Random randomizer)
         {
             Gene g;
@@ -78,6 +83,8 @@ namespace ZenGardenBaby.Model
 	        } 
         }
 
+        //deprecated, s vlastnym Random vnutri to nefunguje dobre,
+        //seed sa totiz opakuje
         public void Mutate()
         {
             //mozno rozne mutacie, 
@@ -91,21 +98,22 @@ namespace ZenGardenBaby.Model
         public void Mutate(Random randomizer, double percent)
         {
             //mozno rozne mutacie, 
-            //zatial vymenim nahodne dva geny vedla seba
+            
             if (randomizer.NextDouble()<=percent)
             {
                 int pos = randomizer.Next(Chromosome.Count - 1);
-
+                //zatial vymenim nahodne dva geny vedla seba
                 Chromosome.Reverse(pos, 2);
                 pos = randomizer.Next(Chromosome.Count);
 
-
+                //na nahodnej pozicii zmenim prederovany smer
                 pos = randomizer.Next(Chromosome.Count);
                 bool tr = Chromosome.ElementAt(pos).TurnsRight;
                 Chromosome.ElementAt(pos).TurnsRight = !tr;
 
                 pos = randomizer.Next(Chromosome.Count);
 
+                //nahodny gen uplne cely zmenim = novy smer, nova vstupna pozicia
                 tr = randomizer.Next(2) == 1 ? true : false;
                 int start = randomizer.Next(this.Treshold);
                 while (null != Chromosome.Where(t => t.Start == start).FirstOrDefault())
@@ -119,6 +127,8 @@ namespace ZenGardenBaby.Model
             
         }
 
+        //mnich pri narazeni do prekazky vzdy preferuje smer, ktory ma v gene, ak vsak do tej strany nemoze ist,
+        //pojde do tej druhej
         protected int Rake(Board b,bool turnsRight, int start_x,int start_y, char mark, Direction dir,ref bool was_stuck)
         {
             int x = start_x;
@@ -264,7 +274,6 @@ namespace ZenGardenBaby.Model
                             break;
                         case Direction.Left:
                             new_x = x - 1;
-                            //return 1;
                             if (new_x < 0)
                                 return raked;
                             else if (b.Map[new_x, y] != Board.Nothing)
@@ -303,7 +312,7 @@ namespace ZenGardenBaby.Model
                                 }
                             }
                             x = new_x;
-                            //return 1;
+                            
                             break;
                         default:
                             break;
@@ -523,7 +532,6 @@ namespace ZenGardenBaby.Model
 
         public void EvaluateOn(Board b)
         {
-            double fitness = 0.0;
             var a = Encoding.ASCII.GetBytes("a")[0];
             //poprechadzaj celu mapu podla instrukcii, pojde to postupne, kedze list je zoradeny
             //Console.WriteLine("X= {0} Y={1} obvod={2}", b.X, b.Y, 2 * (b.X + b.Y));
@@ -597,7 +605,6 @@ namespace ZenGardenBaby.Model
 
 
             RakedSurfaceMap = b.ToString();
-            //fitness = sum;
             this.Fitness = sum;
         }
 

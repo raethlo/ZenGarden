@@ -27,6 +27,11 @@ namespace ZenGardenBaby
         private Random rand = new Random();
         private Board board = null;
         BackgroundWorker bw = new BackgroundWorker();
+        private bool elitarism_on = true;
+        private double mutation_chance = 0.6;
+        private int runtime = 5000;
+        private ISelectionStrategy selection = new TournamentSelection();
+        private int pop_size = 100;
 
         public MainWindow()
         {
@@ -142,9 +147,11 @@ namespace ZenGardenBaby
                     if (File.Exists("max_fitness.txt"))
                         File.Delete("max_fitness.txt");
                     var args = new List<object>();
-                    args.Add(5000);
+                    args.Add(runtime);
+                    
                     int voila = board.Surface() - board.Stones.Count;
                     args.Add(voila);
+                    args.Add(cbElites.IsChecked.Value);
                     bw.RunWorkerAsync(args); 
                 } 
                 else
@@ -186,19 +193,21 @@ namespace ZenGardenBaby
             List<object> args= e.Argument as List<object>;
             int loops = (int)args.ElementAt(0);
             int surface = (int) args.ElementAt(1);
+            elitarism_on = (bool)args.ElementAt(2);
 
             if (board != null)
             {
                 int i = 0;
                 Population pop = new Population(board);
-                pop.GenerateFirstPopulation(100, rand);
+                pop.GenerateFirstPopulation(pop_size, rand);
                 worker.ReportProgress(0, pop.ToString());
 
                 
                 while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals(surface)) )
                 {
-                    pop.Selection(0.05, new TournamentSelection(),true);
-                    pop.Breed(rand,0.6);
+                    pop.Selection(0.05, selection,elitarism_on);
+                    worker.ReportProgress(0, "elites = " + elitarism_on.ToString());
+                    pop.Breed(rand,mutation_chance);
                     //pop.EvaluateAllRandomly();
                     pop.Sort();
                     i++;
@@ -220,6 +229,50 @@ namespace ZenGardenBaby
         private void BtnClear_Click(object sender, RoutedEventArgs e)
         {
             t.Clear();
+        }
+
+        private void tbRun_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                runtime = int.Parse(tbRun.Text);
+                tbRun.Text = runtime.ToString();
+            }
+            catch (Exception)
+            {
+                //runtime =
+                MessageBox.Show("Nespravne zadany pocet iteracii");
+            }
+        }
+
+        private void tbPop_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                pop_size = int.Parse(tbPop.Text);
+                tbPop.Text = pop_size.ToString();
+            }
+            catch (Exception)
+            {
+                //runtime =
+                MessageBox.Show("Nespravne zadana velkost populacie");
+            }
+        }
+
+        private void tbMut_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                mutation_chance = double.Parse(tbMut.Text);
+                if (mutation_chance < 0.0 || mutation_chance > 1.0)
+                    throw new Exception();
+                tbMut.Text = mutation_chance.ToString();
+            }
+            catch (Exception)
+            {
+                //runtime =
+                MessageBox.Show("Mutation chance musi byt z intervalu <0,1>");
+            }
         }
 
 
