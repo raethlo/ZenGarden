@@ -31,7 +31,7 @@ namespace ZenGardenBaby
         private double elite_rate = 0.05;
         private double mutation_chance = 0.6;
         private int runtime = 5000;
-        private static ISelectionStrategy tournament = new TournamentSelection();
+        private static ISelectionStrategy tournament = new TournamentSelection(4);
         private static ISelectionStrategy just_elites = new JustElites();
         private ISelectionStrategy selection = tournament;
         private int pop_size = 100;

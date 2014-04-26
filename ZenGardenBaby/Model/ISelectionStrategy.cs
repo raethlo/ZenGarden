@@ -23,20 +23,25 @@ namespace ZenGardenBaby.Model
 
     class TournamentSelection : ISelectionStrategy
     {
-
+        public int GroupSize { get; set; }
+        public TournamentSelection(int groups)
+        {
+            if (groups < 2)
+                throw new ArgumentException("Group size must be 2 or greater");
+            this.GroupSize = groups;
+        }
         public List<Monk> Selection(Population population)
         {
             List<Monk> result = new List<Monk>();
             Random r  = new Random();
             int length = population.Chromosomes.Count;
-            int groupsize = 4;
 
             List<List<Monk>> groups = new List<List<Monk>>();
             List<Monk> group = new List<Monk>();
 
             for (int i = 0; i < length; i++)
             {
-                if (i % groupsize == 0 && i!=0)
+                if (i % GroupSize == 0 && i!=0)
                 {
                     groups.Add(group);
                     group.Clear();
