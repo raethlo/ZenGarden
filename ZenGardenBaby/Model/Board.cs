@@ -23,6 +23,8 @@ namespace ZenGardenBaby.Model
         public void LoadFromFile(string path)
         {
             string[] lines = null;
+            if(Stones.Count > 0)
+                Stones.Clear();
             try
             {
                 lines = File.ReadAllLines(path);

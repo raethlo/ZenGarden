@@ -86,17 +86,25 @@ namespace ZenGardenBaby.Model
         {
             int count = Size - Chromosomes.Count;
             List<Monk> children = new List<Monk>();
+            List<int> visited = new List<int>();
 
             for (int i = 0; i < count; i++)
             {
                 int m = -1;
                 int t = -1;
 
-                m = randomizer.Next(Chromosomes.Count);
+                //m = randomizer.Next(Chromosomes.Count);
                 do
                 {
                     t = randomizer.Next(Chromosomes.Count); 
-                } while (t == m);
+                } while (visited.Contains(t) && (visited.Count<Chromosomes.Count));
+                visited.Add(t);
+
+                do
+                {
+                    m = randomizer.Next(Chromosomes.Count);
+                } while (visited.Contains(m) && (visited.Count < Chromosomes.Count) || (m == t));
+                visited.Add(m);
 
                 Monk mother = Chromosomes.ElementAt(m);
                 Monk father = Chromosomes.ElementAt(t);

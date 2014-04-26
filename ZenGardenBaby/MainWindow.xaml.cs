@@ -28,9 +28,12 @@ namespace ZenGardenBaby
         private Board board = null;
         BackgroundWorker bw = new BackgroundWorker();
         private bool elitarism_on = true;
+        private double elite_rate = 0.05;
         private double mutation_chance = 0.6;
         private int runtime = 5000;
-        private ISelectionStrategy selection = new TournamentSelection();
+        private static ISelectionStrategy tournament = new TournamentSelection();
+        private static ISelectionStrategy just_elites = new JustElites();
+        private ISelectionStrategy selection = tournament;
         private int pop_size = 100;
 
         public MainWindow()
@@ -40,45 +43,8 @@ namespace ZenGardenBaby
             bw.WorkerReportsProgress = true;
             bw.ProgressChanged += bw_ProgressChanged;
             bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-        }
-
-        private void BtnHello_Click(object sender, RoutedEventArgs e)
-        {
-            if (board!=null)
-            {
-                int obvod = board.Circumference();
-                var father = new Monk(obvod / 2 + board.Stones.Count, obvod, rand);
-                var mother = new Monk(obvod / 2 + board.Stones.Count, obvod, rand);
-                //var father = new Monk(obvod / 4, obvod, rand);
-                //var mother = new Monk(obvod / 4, obvod, rand);
-                father.EvaluateOn(board);
-                AppendLine("FATHER");
-                AppendLine("Fitness = " + father.Fitness.ToString());
-                AppendLine(father.PrintResult()); 
-
-                mother.EvaluateOn(board);
-                AppendLine("MOTHER");
-                AppendLine("Fitness = " + mother.Fitness.ToString());
-                AppendLine(mother.PrintResult());
-
-                var kid = new Monk(mother, father);
-
-                kid.EvaluateOn(board);
-                AppendLine("KID");
-                AppendLine("Fitness = " + kid.Fitness.ToString());
-                AppendLine(kid.PrintResult());
-
-                kid.Mutate();
-                kid.EvaluateOn(board);
-                AppendLine("MUTANT");
-                AppendLine("Fitness = " + kid.Fitness.ToString());
-                AppendLine(kid.PrintResult()); 
-            }
-            else
-            {
-                AppendLine("Board not loaded yet");
-            }
-            
+            cbSelection.Checked += cbSelection_Checked;
+            cbSelection.Unchecked += cbSelection_Unchecked;
         }
 
         private void BtnLoad_Click(object sender, RoutedEventArgs e)
@@ -113,6 +79,11 @@ namespace ZenGardenBaby
                         AppendLine(board.X.ToString() + " " + board.Y.ToString());
                         AppendLine(board.ToString());
                         AppendLine("Surface = " + board.Surface());
+                        AppendLine("Strategy = " + selection.ToString());
+                        AppendLine("Elites = " + elitarism_on);
+                        AppendLine("Population size = " + pop_size);
+                        AppendLine("Elite rate = " + elite_rate);
+                        AppendLine("Mutation rate = " + mutation_chance);
                     }
                 }
                 catch (Exception ex)
@@ -152,6 +123,12 @@ namespace ZenGardenBaby
                     int voila = board.Surface() - board.Stones.Count;
                     args.Add(voila);
                     args.Add(cbElites.IsChecked.Value);
+                    tbMut.IsEnabled = false;
+                    tbRun.IsEnabled = false;
+                    tbPop.IsEnabled = false;
+                    cbElites.IsEnabled = false;
+                    cbSelection.IsEnabled = false;
+                    prgBar.Visibility = Visibility.Visible;
                     bw.RunWorkerAsync(args); 
                 } 
                 else
@@ -185,6 +162,12 @@ namespace ZenGardenBaby
             {
                 AppendLine(String.Format("Solution found in {0}. iteration",res));
             }
+            tbMut.IsEnabled = true;
+            tbRun.IsEnabled = true;
+            tbPop.IsEnabled = true;
+            cbElites.IsEnabled = true;
+            cbSelection.IsEnabled = true;
+            prgBar.Visibility = Visibility.Hidden;
         }
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -205,7 +188,7 @@ namespace ZenGardenBaby
                 
                 while ((i < loops) && (!pop.Chromosomes.First().Fitness.Equals(max_fitness)) )
                 {
-                    pop.Selection(0.05, selection,elitarism_on);
+                    pop.Selection(elite_rate, selection,elitarism_on);
                     pop.Breed(rand,mutation_chance);
                     pop.Sort();
                     i++;
@@ -257,23 +240,92 @@ namespace ZenGardenBaby
             }
         }
 
-        private void tbMut_TextChanged(object sender, TextChangedEventArgs e)
+        //private void tbMut_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    double old = mutation_chance;
+        //    try
+        //    {
+                
+        //        mutation_chance = double.Parse(tbMut.Text);
+        //        if (mutation_chance < 0.0 || mutation_chance > 1.0)
+        //            throw new Exception();
+        //        tbMut.Text = mutation_chance.ToString();
+        //    }
+        //    catch (Exception)
+        //    {
+        //        mutation_chance = old;
+        //        MessageBox.Show("Mutation chance musi byt z intervalu <0,1>");
+        //        tbMut.Text = mutation_chance.ToString();
+        //    }
+        //}
+
+        //private void tbEli_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    double old = elite_rate;
+        //    try
+        //    {
+        //        elite_rate = double.Parse(tbEli.Text);
+        //        if (elite_rate < 0.0 || elite_rate > 1.0)
+        //            throw new Exception();
+        //        tbEli.Text = elite_rate.ToString();
+        //    }      
+        //    catch (Exception)
+        //    {
+        //        //runtime =
+        //        elite_rate = old;
+        //        MessageBox.Show("Elite rate musi byt z intervalu <0,1>");
+        //        tbEli.Text = elite_rate.ToString();
+        //    }
+        //}
+
+        private void cbSelection_Checked(object sender, RoutedEventArgs e)
         {
+            selection = tournament;
+        }
+
+        private void cbSelection_Unchecked(object sender, RoutedEventArgs e)
+        {
+            selection = just_elites;
+        }
+
+        private void btnMutSave_Click(object sender, RoutedEventArgs e)
+        {
+            double old = mutation_chance;
             try
             {
+
                 mutation_chance = double.Parse(tbMut.Text);
                 if (mutation_chance < 0.0 || mutation_chance > 1.0)
                     throw new Exception();
                 tbMut.Text = mutation_chance.ToString();
+                AppendLine("Saved");
+            }
+            catch (Exception)
+            {
+                mutation_chance = old;
+                MessageBox.Show("Mutation chance musi byt z intervalu <0,1>");
+                tbMut.Text = mutation_chance.ToString();
+            }
+        }
+
+        private void btnEliSave_Click(object sender, RoutedEventArgs e)
+        {
+            double old = elite_rate;
+            try
+            {
+                elite_rate = double.Parse(tbEli.Text);
+                if (elite_rate < 0.0 || elite_rate > 1.0)
+                    throw new Exception();
+                tbEli.Text = elite_rate.ToString();
+                AppendLine("Saved");
             }
             catch (Exception)
             {
                 //runtime =
-                MessageBox.Show("Mutation chance musi byt z intervalu <0,1>");
+                elite_rate = old;
+                MessageBox.Show("Elite rate musi byt z intervalu <0,1>");
+                tbEli.Text = elite_rate.ToString();
             }
         }
-
-
-
     }
 }
